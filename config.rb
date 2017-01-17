@@ -2,6 +2,9 @@
 # Page options, layouts, aliases and proxies
 ###
 
+# Page Processing
+require 'slim'
+
 # Per-page layout changes:
 #
 # With no layout
@@ -21,6 +24,13 @@ page '/*.txt', layout: false
 # Clean URLs
 activate :directory_indexes
 
+# Use Webpack as external pipeline
+activate :external_pipeline,
+         name: :webpack,
+         command: build? ? "npm run build" : "npm start",
+         source: ".tmp/dist",
+         latency: 1
+
 # Reload the browser automatically whenever files change
 configure :development do
   activate :livereload
@@ -39,12 +49,6 @@ end
 
 # Build-specific configuration
 configure :build do
-  # Minify CSS on build
-  activate :minify_css
-
-  # Minify Javascript on build
-  activate :minify_javascript
-
   activate :asset_hash
 
   # activate :asset_host
@@ -67,11 +71,3 @@ configure :build do
                  sitemap: "http://#{config[:host]}/sitemap.xml"
   end
 end
-
-activate :external_pipeline,
-         name: :webpack,
-         command: build? ?
-         'webpack --bail' :
-         'webpack --watch -d',
-         source: ".tmp/dist",
-         latency: 1
